@@ -24,6 +24,10 @@ public:
 	Bignum operator+(Bignum other);
 	bool operator<(Bignum other);
 	bool operator==(Bignum other);
+	Bignum& operator+=(Bignum other);
+	Bignum operator+(double double_number);
+	Bignum& operator++();
+	Bignum operator++(int);
 	friend std::ostream& operator << (std::ostream& out,Bignum num);
 	friend std::istream& operator >> (std::istream& in, Bignum& num);
 private:
@@ -32,5 +36,9 @@ private:
 	bool is_negative;
 	int sign_position;
 };
+bool operator==(double double_number,Bignum number);
+bool operator<(double double_number,Bignum number);
+Bignum operator+(double double_number,Bignum number);
+Bignum operator-(Bignum num);
 
 #endif

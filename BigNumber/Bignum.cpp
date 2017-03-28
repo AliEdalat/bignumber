@@ -3,17 +3,6 @@
 using namespace std;
 
 void update_number(string& number,vector<Digit> digits,bool is_negative,int found){
-	int j=0;
-	for (int i = digits.size()-1; i >= 0; i--)
-	{
-		if(digits[i].get_digit() == 0){
-			j=i;
-		}
-		else{
-			j=i;
-			break;
-		}
-	}
 	string temp;
 	for (int k = 0; k < digits.size(); k++)
 	{
@@ -33,10 +22,10 @@ void update_number(string& number,vector<Digit> digits,bool is_negative,int foun
 	{
 		temp=string("-")+temp;
 	}
-	if (temp[0] == '.' || temp[1] == '.')
+	if (temp[0] == '.' || (temp[1] == '.' && (temp[0] == '-' || temp[0] == '+' )))
 	{
 		int find=temp.find('.');
-		temp.insert(find,1,'0');
+		temp.insert(find+1,1,'0');
 	}
 	number=temp;
 }
@@ -77,7 +66,7 @@ void remove_not_important_digits(vector<Digit>& digits,string number,int& sign_p
 		}
 	}
 	if(sign_position < number.size()){
-		for (int i = digits.size()-1; i >= 0; i--)
+		for (int i = digits.size()-1; i >= sign_position-1; i--)
 		{
 			if(digits[i].get_digit() != 0){
 				digits.erase(digits.end()+(i-digits.size()+1),digits.end());
@@ -122,8 +111,7 @@ Bignum::Bignum(string string_number){
 		}
 	}
 	number=string_number;
-	cout<<sign_position<<endl;
-	cout<<string_number<<endl;
+	//cout<<"constractor :"<<string_number<<endl;
 	update_digits(digits,string_number);
 	remove_not_important_digits(digits,string_number,sign_position);
 }
@@ -152,7 +140,7 @@ istream& operator >> (istream& in,Bignum& num){
 	//check valid numbers;
 	in>>num.number;
 	string temp=num.number;
-	cout<<temp<<endl;
+	//cout<<"operator>> :"<<temp<<endl;
 	update_digits(num.digits,num.number);
 	num.sign_position=num.number.size();
 	for (int i = 0; i < temp.size(); ++i)
@@ -193,18 +181,19 @@ Bignum& Bignum::operator=(Bignum num){
 }
 Bignum operator-(Bignum num){
 	string temp=num.get_number();
-	update_number(temp,num.get_digits(),num.get_isnegative(),num.get_signpos());
+	vector<Digit> digits=num.get_digits();
+	update_number(temp,digits,num.get_isnegative(),num.get_signpos());
 	if(num.get_isnegative()){
 		/*int found=temp.find('-');
 		string temp2=temp.substr(found+1);*/
-		update_number(temp,num.get_digits(),!(num.get_isnegative()),num.get_signpos()-1);
-		cout<<temp<<endl;
+		update_number(temp,digits,!(num.get_isnegative()),num.get_signpos()-1);
+		//cout<<temp<<endl;
 		return Bignum(temp);
 	}
 	else{
 		//temp=string("-")+temp;
-		update_number(temp,num.get_digits(),!(num.get_isnegative()),num.get_signpos()+1);
-		cout<<temp<<endl;
+		update_number(temp,digits,!(num.get_isnegative()),num.get_signpos()+1);
+		//cout<<temp<<endl;
 		return Bignum(temp);
 	}
 }
@@ -228,7 +217,7 @@ Digit& Bignum::operator[](int index){
 			if(this->get_isnegative() == true){
 				item-=1;
 			}
-			cout<<item<<endl;
+			//cout<<item<<endl;
 		}
 		return digits[item];
 	}
@@ -245,9 +234,9 @@ void add_zero_digits_end(vector<Digit>& other_number_digits,vector<Digit>& first
 		other_number_digits.insert(other_number_digits.end(),(first_number_digits.size() - other_number_digits.size()),Digit(0));
 	}
 }
-void prepare_oprands(vector<Digit>& other_number_digits,vector<Digit>& first_number_digits,Bignum other,Bignum* first){
-	int first_sign_position=first->get_signpos();
-	int other_sign_position=other.get_signpos();
+void prepare_oprands(vector<Digit>& other_number_digits,vector<Digit>& first_number_digits,int& first_sign_position,int& other_sign_position,Bignum other,Bignum* first){
+	first_sign_position=first->get_signpos();
+	other_sign_position=other.get_signpos();
 	bool first_nagative=first->get_isnegative();
 	bool other_negative=other.get_isnegative();
 	if(first_nagative == true){
@@ -256,42 +245,128 @@ void prepare_oprands(vector<Digit>& other_number_digits,vector<Digit>& first_num
 	if(other_negative == true){
 		other_sign_position-=1;
 	}
-	cout<<first_sign_position<<' '<<other_sign_position<<endl;
 	if(first_sign_position > other_sign_position){
 		other_number_digits.insert(other_number_digits.begin(),(first_sign_position - other_sign_position) ,Digit(0));
+		other_sign_position+=((first_sign_position - other_sign_position));
 		add_zero_digits_end(other_number_digits,first_number_digits);
 	}
 	if(first_sign_position < other_sign_position){
 		first_number_digits.insert(first_number_digits.begin(),(other_sign_position - first_sign_position) ,Digit(0));
+		first_sign_position+=((other_sign_position - first_sign_position));
 		add_zero_digits_end(other_number_digits,first_number_digits);	
 	}
 	if(first_sign_position == other_sign_position){
 		add_zero_digits_end(other_number_digits,first_number_digits);
 	}
+	if(first_nagative == true){
+		first_sign_position+=1;
+	}
+	if(other_negative == true){
+		other_sign_position+=1;
+	}
+}
+vector<Digit> subtraction_act(vector<Digit>& first_number_digits,vector<Digit>& other_number_digits){
+	vector<Digit> result_number_digits;
+	for (int i = first_number_digits.size()-1; i >= 0; i--)
+	{
+		if(first_number_digits[i].get_digit() >= other_number_digits[i].get_digit()){
+			int result=first_number_digits[i].get_digit()-other_number_digits[i].get_digit();
+			result_number_digits.push_back(Digit(result));
+		}
+		else{
+			int result=first_number_digits[i].get_digit()-other_number_digits[i].get_digit()+10;
+			first_number_digits[i-1].set_digit(first_number_digits[i-1].get_digit()-1);
+			result_number_digits.push_back(Digit(result));
+		}
+	}
+	return result_number_digits;
 }
 Bignum Bignum::operator+(Bignum other){
-	int sign_position=this->get_signpos();
+	int first_sign_position , other_sign_position,sign_position;
+	bool is_negative;
 	vector<Digit> result_number_digits;
 	vector<Digit> first_number_digits=this->get_digits();
 	vector<Digit> other_number_digits=other.get_digits();
-	prepare_oprands(other_number_digits,first_number_digits,other,this);
-	int carry=0;
-	for (int i = first_number_digits.size()-1; i >= 0; i--)
-	{
-		int result=carry+first_number_digits[i].get_digit()+other_number_digits[i].get_digit();
-		if(result >= 10){
-			result_number_digits.push_back(Digit(result%10));	
-			carry=result/10;
+	prepare_oprands(other_number_digits,first_number_digits,first_sign_position,other_sign_position,other,this);
+	/*if(other.get_signpos() > sign_position){
+		sign_position=other.get_signpos();
+	}*/
+	/*if(this->get_isnegative() == true){
+		first_sign_position-=1;
+	}
+	if(other.get_isnegative() == true){
+		other_sign_position-=1;
+	}*/
+	sign_position=first_sign_position;
+	if(other_sign_position > first_sign_position){
+		sign_position=other_sign_position;
+	}
+	if(this->get_isnegative() == other.get_isnegative()){
+		is_negative=this->get_isnegative();
+		int carry=0;
+		for (int i = first_number_digits.size()-1; i >= 0; i--)
+		{
+			int result=carry+first_number_digits[i].get_digit()+other_number_digits[i].get_digit();
+			if(result >= 10){
+				result_number_digits.push_back(Digit(result%10));	
+				carry=result/10;
+			}
+			else{
+				result_number_digits.push_back(Digit(result));
+				carry=0;	
+			}
+			
+		}
+		if(carry != 0){
+			result_number_digits.push_back(Digit(carry));
+			sign_position++;
+		}
+	}
+	else{
+		if(this->get_isnegative() == true){
+			this->is_negative=false;
+			this->sign_position-=1;
+			if( *this == other){
+				this->sign_position+=1;
+				this->is_negative=true;
+				return Bignum(0);
+			}
+			else if ( *this < other)
+			{
+				this->sign_position+=1;
+				this->is_negative=true;
+				is_negative=false;
+				result_number_digits=subtraction_act(other_number_digits,first_number_digits);
+			}
+			else{
+				this->sign_position+=1;
+				this->is_negative=true;
+				is_negative=true;
+				result_number_digits=subtraction_act(first_number_digits,other_number_digits);
+			}
 		}
 		else{
-			result_number_digits.push_back(Digit(result));
-			carry=0;	
+			other.is_negative=false;
+			other.sign_position-=1;
+			if( *this == other){
+				other.sign_position+=1;
+				other.is_negative=true;
+				return Bignum(0);
+			}
+			else if ( *this < other)
+			{
+				other.sign_position+=1;
+				other.is_negative=true;
+				is_negative=true;
+				result_number_digits=subtraction_act(other_number_digits,first_number_digits);
+			}
+			else{
+				other.sign_position+=1;
+				other.is_negative=true;
+				is_negative=false;
+				result_number_digits=subtraction_act(first_number_digits,other_number_digits);
+			}
 		}
-		
-	}
-	if(carry != 0){
-		result_number_digits.push_back(Digit(carry));
-		sign_position++;
 	}
 	for (int i = 0; i < result_number_digits.size(); ++i)
 	{
@@ -301,21 +376,58 @@ Bignum Bignum::operator+(Bignum other){
 		}
 	}
 	string temp;
-	update_number(temp,result_number_digits,this->get_isnegative(),sign_position);
-	cout<<temp<<endl;
+	update_number(temp,result_number_digits,is_negative,sign_position);
+	//cout<<"operator+ :"<<temp<<endl;
 	return Bignum(temp);
 }
 bool Bignum::operator<(Bignum other){
-
+	string number1,number2;
+	if (this->get_isnegative() == true && other.get_isnegative() == false)
+	{
+		return true;
+	}
+	if (this->get_isnegative() == false && other.get_isnegative() == true)
+	{
+		return false;
+	}
+	if (*this == other)
+	{
+		//cout<<"operator< :";
+		return false;
+	}
+	if(this->get_isnegative() == false){
+		int first_sign_position,other_sign_position;
+		vector<Digit> first_number_digits=this->get_digits();
+		vector<Digit> other_number_digits=other.get_digits();
+		prepare_oprands(other_number_digits,first_number_digits,first_sign_position,other_sign_position,other,this);
+		update_number(number1,first_number_digits,this->get_isnegative(),first_sign_position);
+		update_number(number2,other_number_digits,this->get_isnegative(),other_sign_position);
+		//cout<<number1<<' '<<number2<<endl;
+		if(number1 < number2){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	else{
+		if(number1 > number2){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 }
 bool Bignum::operator==(Bignum other){
 	if(other.get_isnegative() == this->get_isnegative()){
+		int first_sign_position,other_sign_position;
 		vector<Digit> first_number_digits=this->get_digits();
 		vector<Digit> other_number_digits=other.get_digits();
-		prepare_oprands(other_number_digits,first_number_digits,other,this);
+		prepare_oprands(other_number_digits,first_number_digits,first_sign_position,other_sign_position,other,this);
 		string number1,number2;
-		update_number(number1,first_number_digits,this->get_isnegative(),this->get_signpos());
-		update_number(number2,other_number_digits,this->get_isnegative(),this->get_signpos());
+		update_number(number1,first_number_digits,this->get_isnegative(),first_sign_position);
+		update_number(number2,other_number_digits,this->get_isnegative(),other_sign_position);
 		if(number1.compare(number2) == 0){
 			return true;
 		}
@@ -325,4 +437,37 @@ bool Bignum::operator==(Bignum other){
 		return false;
 	}
 
+}
+Bignum& Bignum::operator+=(Bignum other){
+	*this=*this+other;
+	return *this;
+}
+Bignum Bignum::operator+(double double_number){
+	Bignum temp(double_number);
+	temp+=*this;
+	return temp;
+}
+Bignum operator+(double double_number,Bignum number){
+	Bignum temp(double_number);
+	temp.operator+=(number);
+	return temp;	
+}
+Bignum& Bignum::operator++(){
+	Bignum temp(1);
+	*this+=temp;
+	return *this;
+}
+Bignum Bignum::operator++(int){
+	Bignum copy(this->get_number());
+	Bignum temp(1);
+	*this+=temp;
+	return copy;
+}
+bool operator==(double double_number,Bignum number){
+	Bignum temp(double_number);
+	return (temp==number);
+}
+bool operator<(double double_number,Bignum number){
+	Bignum temp(double_number);
+	return (temp < number);
 }
