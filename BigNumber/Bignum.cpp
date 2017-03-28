@@ -471,3 +471,13 @@ bool operator<(double double_number,Bignum number){
 	Bignum temp(double_number);
 	return (temp < number);
 }
+Bignum& operator+=(Bignum& number,double double_number){
+	Bignum temp(double_number);
+	number+=temp;
+	return number;
+}
+Bignum& operator+=(double double_number,Bignum& number){
+	Bignum temp(double_number);
+	number+=temp;
+	return number;	
+}

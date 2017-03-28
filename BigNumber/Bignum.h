@@ -40,5 +40,7 @@ bool operator==(double double_number,Bignum number);
 bool operator<(double double_number,Bignum number);
 Bignum operator+(double double_number,Bignum number);
 Bignum operator-(Bignum num);
+Bignum& operator+=(Bignum& number,double double_number);
+Bignum& operator+=(double double_number,Bignum& number);
 
 #endif

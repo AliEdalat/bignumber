@@ -44,5 +44,7 @@ int main(){
     Bignum ali(d);
     cout<<ali<<endl;
     cout<< (ali==d)<<endl;
+    cout<<(d+=ali)<<endl;
+    cout<<(ali+=1)<<endl;
     return 0;
 }
