@@ -139,6 +139,10 @@ ostream& operator << (ostream& out,Bignum num){
 istream& operator >> (istream& in,Bignum& num){
 	//check valid numbers;
 	in>>num.number;
+	if (!valid_number(num.number))
+	{
+		throw runtime_error("invalid_number_excaption");
+	}
 	string temp=num.number;
 	//cout<<"operator>> :"<<temp<<endl;
 	update_digits(num.digits,num.number);
@@ -476,7 +480,7 @@ Bignum& operator+=(Bignum& number,double double_number){
 	number+=temp;
 	return number;
 }
-Bignum& operator+=(double double_number,Bignum& number){
+Bignum& operator+=(double& double_number,Bignum& number){
 	Bignum temp(double_number);
 	number+=temp;
 	return number;	

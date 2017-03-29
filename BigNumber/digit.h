@@ -7,6 +7,7 @@ class Digit
 {
 public:
 	Digit();
+	~Digit();
 	Digit(int value);
 	Digit& operator=(int value);
 	int get_digit(){return _digit;}
