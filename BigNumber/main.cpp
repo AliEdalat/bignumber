@@ -35,7 +35,7 @@ int main(){
     cin>>n1[0];
     cout<<n1<<endl;
     cout<<n1+n3<<endl;
-
+    cout<<n1<<endl;
     cout<<n1[0]<<n1[1]<<n1[2]<<n1[3]<<n1[-1]<<n1[-2]<<n1[-3]<<endl;
 
     cout<<12+n3<<endl;
@@ -46,5 +46,11 @@ int main(){
     cout<< (ali==d)<<endl;
     cout<<(d+=ali)<<endl;
     cout<<(ali+=1)<<endl;
+    cout<<d+ali+n4<<endl;
+    Bignum o("-00000.0000");
+    cout<<-o<<endl;
+    cout<<(-o)+Bignum(1)<<endl;
+    int ppp=n1[0];
+    cout<<ppp<<endl;
     return 0;
 }

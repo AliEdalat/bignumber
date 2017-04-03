@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <cstdlib>
 #include <stdexcept>
 #include "digit.h"
@@ -15,10 +16,13 @@ public:
 	Bignum();
 	Bignum(std::string string_number);
 	Bignum(double double_number);
-	Bignum& operator=(Bignum num);
+	Bignum& operator=(const Bignum& num);
 	Digit& operator[](int index);
 	int get_signpos(){return sign_position;}
 	bool get_isnegative(){return is_negative;}
+	bool get_iszero(){return is_zero;}
+	void set_signpos(int position){sign_position=position;}
+	void set_isnegative(bool negative){is_negative=negative;}
 	std::vector<Digit> get_digits(){return digits;}
 	std::string get_number(){return number;}
 	Bignum operator+(Bignum other);
@@ -34,12 +38,13 @@ private:
 	std::string number;
 	std::vector<Digit> digits;
 	bool is_negative;
+	bool is_zero;
 	int sign_position;
 };
 bool operator==(double double_number,Bignum number);
 bool operator<(double double_number,Bignum number);
 Bignum operator+(double double_number,Bignum number);
-Bignum operator-(Bignum num);
+Bignum& operator-(Bignum& num);
 Bignum& operator+=(Bignum& number,double double_number);
 Bignum& operator+=(double& double_number,Bignum& number);
 

@@ -7,9 +7,9 @@ class Digit
 {
 public:
 	Digit();
-	~Digit();
 	Digit(int value);
 	Digit& operator=(int value);
+	operator int() const { return _digit; }
 	int get_digit(){return _digit;}
 	void set_digit(int value){_digit=value;}
 	friend std::ostream& operator << (std::ostream& out,const Digit& num);
