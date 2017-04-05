@@ -9,10 +9,11 @@ public:
 	Digit();
 	Digit(int value);
 	Digit& operator=(int value);
+	Digit& operator=(const Digit& value);
 	operator int() const { return _digit; }
 	int get_digit(){return _digit;}
 	void set_digit(int value){_digit=value;}
-	friend std::ostream& operator << (std::ostream& out,const Digit& num);
+	friend std::ostream& operator << (std::ostream& out,Digit num);
 	friend std::istream& operator >> (std::istream& in, Digit& num);
 private:
 	int _digit;

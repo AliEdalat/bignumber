@@ -20,9 +20,10 @@ Digit& Digit::operator=(int value){
 		throw std::runtime_error("invalid digit value!");
 	}
 	_digit=value;
+	return *this;
 }
-ostream& operator << (ostream& out,const Digit& num){
-	out<<num._digit;
+ostream& operator << (ostream& out,Digit num){
+	out<<num.get_digit();
 	return out; 
 }
 istream& operator >> (istream& in, Digit& num){
@@ -39,4 +40,8 @@ istream& operator >> (istream& in, Digit& num){
 		throw std::runtime_error("invalid digit value!");
 	}
 	return in;
+}
+Digit& Digit::operator=(const Digit& value){
+	_digit=value._digit;
+	return *this;
 }

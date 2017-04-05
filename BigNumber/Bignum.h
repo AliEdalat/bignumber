@@ -23,7 +23,7 @@ public:
 	bool get_iszero(){return is_zero;}
 	void set_signpos(int position){sign_position=position;}
 	void set_isnegative(bool negative){is_negative=negative;}
-	std::vector<Digit> get_digits(){return digits;}
+	std::vector<Digit> get_digits();
 	std::string get_number(){return number;}
 	Bignum operator+(Bignum other);
 	bool operator<(Bignum other);
@@ -36,7 +36,8 @@ public:
 	friend std::istream& operator >> (std::istream& in, Bignum& num);
 private:
 	std::string number;
-	std::vector<Digit> digits;
+	std::vector<Digit> digits_befor;
+	std::vector<Digit> digits_after;
 	bool is_negative;
 	bool is_zero;
 	int sign_position;
@@ -44,7 +45,7 @@ private:
 bool operator==(double double_number,Bignum number);
 bool operator<(double double_number,Bignum number);
 Bignum operator+(double double_number,Bignum number);
-Bignum& operator-(Bignum& num);
+Bignum operator-(Bignum& num);
 Bignum& operator+=(Bignum& number,double double_number);
 Bignum& operator+=(double& double_number,Bignum& number);
 
