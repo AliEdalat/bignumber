@@ -15,19 +15,19 @@ void convert_digits_to_string(string& number,vector<Digit> digits,bool is_negati
 		}
 		temp.push_back((char)(digits[k].get_digit()+48));
 	}
-	if( temp.find('.') == -1){
+	/*if( temp.find('.') == -1){
 		temp.push_back('.');
 		temp.push_back('0');
-	}
+	}*/
 	if (is_negative)
 	{
 		temp=string("-")+temp;
 	}
-	if (temp[0] == '.' || (temp[1] == '.' && (temp[0] == '-' || temp[0] == '+' )))
+	/*if (temp[0] == '.' || (temp[1] == '.' && (temp[0] == '-' || temp[0] == '+' )))
 	{
 		int find=temp.find('.');
 		temp.insert(find+1,1,'0');
-	}
+	}*/
 	number=temp;
 }
 bool valid_number(string num){
@@ -69,7 +69,22 @@ void remove_not_important_digits(vector<Digit>& digits_after,vector<Digit>& digi
 		digits_befor.clear();
 		digits_befor.push_back(Digit(0));
 		sign_position=1;
+		if(number.find('-') >= 0){
+			sign_position++;
+		}
+		return;
 	}
+	/*for (int i = 0; i < digits_befor.size(); ++i)
+	{
+		cout<<digits_befor[i].get_digit();
+	}
+	cout<<endl;
+	for (int i = 0; i < digits_after.size(); ++i)
+	{
+		cout<<digits_after[i].get_digit();
+	}
+	cout<<endl;
+	*/
 	for (int i = digits_befor.size()-1; i >= 0; i--)
 	{
 		if(digits_befor[i].get_digit() != 0){
@@ -79,7 +94,7 @@ void remove_not_important_digits(vector<Digit>& digits_after,vector<Digit>& digi
 			break;
 		}
 	}
-	if(sign_position < number.size()){
+	//if(sign_position < number.size()){
 		for (int i = digits_after.size()-1; i >= 0; i--)
 		{
 			if(digits_after[i].get_digit() != 0){
@@ -87,26 +102,72 @@ void remove_not_important_digits(vector<Digit>& digits_after,vector<Digit>& digi
 				break;
 			}
 		}
-	}
+	//}
 }
 void convert_string_to_digits(vector<Digit>& digits_after,vector<Digit>& digits_befor,string number){
 	digits_after.clear();digits_befor.clear();
 	int found=number.find('.');
-	for (int i = 0; i < found; ++i)
-	{
-		if(number[i]=='-'){
-			continue;
+	if( found > 0){
+		if (number[0] == '.' || (number[1] == '.' && (number[0] == '-' || number[0] == '+' )))
+		{
+			int find=number.find('.');
+			if(find == 0){
+				number.insert(number.begin(),1,'0');
+			}
+			else{
+				number.insert(find-1,1,'0');
+			}
+			found=number.find('.');
 		}
-		//cout<<number[i]<<endl;
-		digits_befor.push_back(Digit(number[i]-48));
+		for (int i = 0; i < found; ++i)
+		{
+			if(number[i]=='-'){
+				continue;
+			}
+			//cout<<number[i]<<endl;
+			digits_befor.push_back(Digit(number[i]-48));
+		}
+		reverse(digits_befor.begin(),digits_befor.end());
+		for (int i = found+1; i < number.size() ; ++i)
+		{
+			//cout<<number[i]<<endl;
+			digits_after.push_back(Digit(number[i]-48));
+		}
 	}
-	reverse(digits_befor.begin(),digits_befor.end());
-	for (int i = found+1; i < number.size() ; ++i)
-	{
-		//cout<<number[i]<<endl;
-		digits_after.push_back(Digit(number[i]-48));
+	else{
+		for (int i = 0; i < number.size(); ++i)
+		{
+			if(number[i]=='-'){
+				continue;
+			}
+			//cout<<number[i]<<endl;
+			digits_befor.push_back(Digit(number[i]-48));
+		}
+		reverse(digits_befor.begin(),digits_befor.end());
 	}
 	//cout<<"size :"<<digits_after.size()<<endl;
+}
+int find_signposition(string& string_number){
+	if (string_number[0] == '.' || (string_number[1] == '.' && (string_number[0] == '-' || string_number[0] == '+' )))
+	{
+		int find=string_number.find('.');
+		if(find == 0){
+			string_number.insert(string_number.begin(),1,'0');
+		}
+		else{
+			string_number.insert(find-1,1,'0');
+		}
+	}
+	//cout<<string_number<<endl;
+	int sign_position=string_number.size();
+	for (int i = 0; i < string_number.size(); ++i)
+	{
+		if(string_number[i] == '.'){
+			sign_position=i;
+			break;
+		}
+	}
+	return sign_position;
 }
 bool find_zero_number(vector<Digit> digits){
 	for (int i = 0; i < digits.size(); ++i)
@@ -136,17 +197,22 @@ Bignum::Bignum(string string_number){
 		is_negative=false;
 	}
 	is_zero=false;
-	sign_position=string_number.size();
-	for (int i = 0; i < string_number.size(); ++i)
-	{
-		if(string_number[i] == '.'){
-			sign_position=i;
-			break;
-		}
-	}
+	sign_position=find_signposition(string_number);
 	number=string_number;
 	//cout<<"constractor :"<<string_number<<endl;
 	convert_string_to_digits(digits_after,digits_befor,string_number);
+	//cout<<"befor_size :"<<digits_befor.size()<<' ';
+	for (int i = 0; i < digits_befor.size(); ++i)
+	{
+		//cout<<digits_befor[i].get_digit();
+	}
+	//cout<<endl;
+	//cout<<"after_size :"<<digits_after.size()<<' ';
+	for (int i = 0; i < digits_after.size(); ++i)
+	{
+		//cout<<digits_after[i].get_digit();
+	}
+	//cout<<endl;
 	remove_not_important_digits(digits_after,digits_befor,string_number,sign_position);
 	if(find_zero_number(digits_after) && find_zero_number(digits_befor)){
 		is_zero=true;
@@ -156,6 +222,16 @@ Bignum::Bignum(string string_number){
 			sign_position--;	
 		}
 	}
+	for (int i = 0; i < digits_befor.size(); ++i)
+	{
+		//cout<<digits_befor[i].get_digit();
+	}
+	//cout<<endl;
+	for (int i = 0; i < digits_after.size(); ++i)
+	{
+		//cout<<digits_after[i].get_digit();
+	}
+	//cout<<endl;
 	//cout<<"size :"<<digits_after.size()<<endl;
 }
 Bignum::Bignum(double double_number){
@@ -194,22 +270,23 @@ vector<Digit> Bignum::get_digits(){
 }
 ostream& operator << (ostream& out,Bignum num){
 	string temp=num.number;
-	vector<Digit> digits=num.get_digits();
-	for (int i = 0; i < digits.size(); ++i)
-	{
+	//vector<Digit> digits=num.get_digits();
+	//for (int i = 0; i < digits.size(); ++i)
+	//{
 		//cout<<digits[i].get_digit()<<' ';
-	}
+	//}
 	//cout<<endl;
 	//cout<<"remove_not_important_digits :"<<endl;
 	remove_not_important_digits(num.digits_after,num.digits_befor,temp,num.sign_position);
-	digits=num.get_digits();
-	for (int i = 0; i < digits.size(); ++i)
-	{
+	vector<Digit> digits=num.get_digits();
+	//for (int i = 0; i < digits.size(); ++i)
+	//{
 		//cout<<digits[i].get_digit()<<' ';
-	}
+	//}
 	//cout<<endl;
 	//cout<<"convert_digits_to_string :"<<endl;
 	convert_digits_to_string(temp,digits,num.is_negative,num.get_signpos());
+	//cout<<temp<<endl;
 	out<<temp;
 	return out;
 }
@@ -250,8 +327,10 @@ Bignum& Bignum::operator=(const Bignum& num){
 }
 Bignum operator-(Bignum& num){
 	string string_number;
+	//cout<<string_number<<endl;
 	vector<Digit> digits=num.get_digits();
 	convert_digits_to_string(string_number,digits,num.get_isnegative(),num.get_signpos());
+	//cout<<string_number<<endl;
 	Bignum temp(string_number);
 	//cout<<"after :"<<temp<<endl;
 	if(temp.get_isnegative() && !(temp.get_iszero())){

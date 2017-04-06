@@ -38,7 +38,8 @@ int main(){
     cout<<n1+n3<<endl;
     cout<<n1<<endl;
     cout<<n1[0]<<n1[1]<<n1[2]<<n1[3]<<n1[-1]<<n1[-2]<<n1[-3]<<endl;
-
+    n1[5]=9;
+    cout<<n1<<endl;
     cout<<12+n3<<endl;
     cout<<n3+12<<endl;
     double d=1.123454;
@@ -49,9 +50,12 @@ int main(){
     cout<<(ali+=1)<<endl;
     cout<<d+ali+n4<<endl;
     Bignum o("-00000.0000");
-    cout<<-o<<endl;
+    cout<<(-o)<<endl;
     cout<<(-o)+Bignum(1)<<endl;
     int ppp=n1[0];
     cout<<ppp<<endl;
+    Bignum n100("-.1234");
+    cout<<n100<<endl;
+    cout<<n1+100<<endl;
     return 0;
 }
